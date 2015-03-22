@@ -172,13 +172,13 @@ sub get_command {
     my($stmt,@bind)=$sql->select($table,[qw/host port cmd time/],$data);
     my $cmd=$db->selectall_arrayref($stmt,{slice=>{}},@bind);
     return $cmd;
+}    
 =pod
 handling_cpu
 type:controller method
 takes:method name, data with form
 return:html template and array ref in stash or message of incorrect data
 =cut    
-}
 sub handling_cpu {
 	my $self=shift;
 	my $host=$self->param('host');
