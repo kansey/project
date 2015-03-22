@@ -59,19 +59,6 @@ sub check_email {
 	return $check;
 }
 =pod
-create_user  
-type:function
-takes:Ref to a hash with the values for the selection conditions,helper db,helper sql
-return:An undef is returned if an error occurs or true if the string changed 
-=cut
-sub create_user {
-	my($data,$db,$sql)=@_;
-    my $table='users';
-    my($stmt,@bind)=$sql->insert($table,$data);
-    my $sth =$db->prepare($stmt);
-    $sth->execute(@bind);
-}
-=pod
 get_id_user  
 type:function
 takes:scalar variable with a value of a login form,helper db,helper sql
@@ -87,17 +74,16 @@ sub get_id_user {
     return $id;
 }
 =pod
-create_email_for_user  
+insertions 
 type:function
-takes:Ref to a hash with the values for the selection conditions,helper db,helper sql
-return:An undef is returned if an error occurs or true if the string changed 
+takes:scalar var with value name table,ref to a hash with values fields in table,helper db,helper sql
+return:An undef is returned if an error occurs or true if the string changed
 =cut
-sub create_email_for_user{
-	my($data,$db,$sql)=@_;
-	my $table='email';
-	my($stmt,@bind)=$sql->insert($table,$data);
-    my $sth =$db->prepare($stmt);
-    $sth->execute(@bind);
+sub insertions {
+	my($table,$fieldvals,$db,$sql)=@_;
+	my($stmt,@bind)=$sql->insert($table,$fieldvals);
+	my $sth =$db->prepare($stmt);
+	$sth->execute(@bind);
 }
 =pod
 get_id_by_mail  
@@ -192,10 +178,10 @@ sub registration {
 	}
     my $sql=$self->sql;
     my %insertion_data_user=get_hash_user($login,$password);
-    create_user(\%insertion_data_user,$self->db,$sql);
+    insertions('users',\%insertion_data_user,$self->db,$sql);
     my $id_user=get_id_user($login,$self->db,$sql);
     my %insertion_data_mail=get_hash_mail($id_user,$mail);
-    create_email_for_user(\%insertion_data_mail,$self->db,$sql);
+    insertions('email',\%insertion_data_mail,$self->db,$sql);
 }
 =pod
 sendmail

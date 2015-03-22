@@ -60,19 +60,6 @@ sub get_hash_host_data {
 		);
 }
 =pod
-create_host_query
-type:function
-takes:Ref to a hash with the values for the selection conditions,helper db,helper sql
-return:An undef is returned if an error occurs or true if the string changed  
-=cut
-sub create_host_query {
-	my($data,$db,$sql)=@_;
-	my $table='host_data';
-	my($stmt,@bind)=$sql->insert($table,$data);
-    my $sth =$db->prepare($stmt);
-    $sth->execute(@bind);
-}
-=pod
 splitting
 type:function
 takes:string with the results of the command ps
@@ -126,18 +113,20 @@ sub get_hash_host_answer{
 	);
 }
 sub get_hash_id_user {return my %hash=(id_user=>$_[0]);}
+sub get_arr_id_user {return my $arr=[$_[0]]};
+sub get_hash_login {return my %hash=(login=>$_[0]);}
 =pod
-create_host_answer
+insertions 
 type:function
-takes:Ref to a hash with the values for the selection conditions,helper db,helper sql
+takes:scalar var with value name table,ref to a hash with values fields in table,helper db,helper sql
 return:An undef is returned if an error occurs or true if the string changed
 =cut
-sub create_host_answer {
-	my($data,$db,$sql)=@_;
-	my $table='host_answer';
-	my($stmt,@bind)=$sql->insert($table,$data);
-    my $sth =$db->prepare($stmt);
-    $sth->execute(@bind);
+sub insertions {
+	my($table,$fieldvals,$db,$sql)=@_;
+	#my $sql=SQL::Abstract->new;
+	my($stmt,@bind)=$sql->insert($table,$fieldvals);
+	my $sth =$db->prepare($stmt);
+	$sth->execute(@bind);
 }
 =pod
 plotting 
@@ -215,8 +204,8 @@ sub handling_cpu {
 	($stdout, $stderr, $exit) = $SSH->cmd('ps -aux --sort=-%cpu | head -16');
 	my $sql=$self->sql;
     my $id_user=get_id_user($login_cookie,$self->db,$sql);
- 	my %insertion_data_host=get_hash_host_data($id_user,$host,$login,$password,$port,$date,'ps -aux --sort=-%cpu | head -16');
-    create_host_query(\%insertion_data_host,$self->db,$sql);
+    my %insertion_data_host=get_hash_host_data($id_user,$host,$login,$password,$port,$date,'ps -aux --sort=-%cpu | head -16');
+    insertions('host_data',\%insertion_data_host,$self->db,$sql);
     my @stdout=split /\n/, $stdout;
     delete $stdout[0];
     @stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
@@ -225,7 +214,7 @@ sub handling_cpu {
     my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
     $date=generate_date($date);
     my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
-    create_host_answer(\%insertion_data_answer,$self->db,$sql);
+    insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
     $self->stash(split_stdout =>[@prepared_data]);  
 }
 =pod
@@ -259,7 +248,7 @@ sub handling_vsz {
  	my $sql=$self->sql;
     my $id_user=get_id_user($login_cookie,$self->db,$sql);
  	my %insertion_data_host=get_hash_host_data($id_user,$host,$login,$password,$port,$date,'ps -aux --sort=-vsz | head -16');
-    create_host_query(\%insertion_data_host,$self->db,$sql);
+    insertions('host_data',\%insertion_data_host,$self->db,$sql);
     my @stdout=split /\n/, $stdout;
     delete $stdout[0];
     @stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
@@ -268,7 +257,7 @@ sub handling_vsz {
     my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
     $date=generate_date($date);
     my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
-    create_host_answer(\%insertion_data_answer,$self->db,$sql);
+    insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
     $self->stash(split_stdout =>[@prepared_data]);
 }
 =pod
@@ -302,7 +291,7 @@ sub handling_rss {
  	my $sql=$self->sql;
     my $id_user=get_id_user($login_cookie,$self->db,$sql);
  	my %insertion_data_host=get_hash_host_data($id_user,$host,$login,$password,$port,$date,'ps -aux --sort=-rss|head -16');
-    create_host_query(\%insertion_data_host,$self->db,$sql);
+    insertions('host_data',\%insertion_data_host,$self->db,$sql);
     my @stdout=split /\n/, $stdout;
     delete $stdout[0];
     @stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
@@ -311,7 +300,8 @@ sub handling_rss {
     my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
     $date=generate_date($date);
     my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
-    create_host_answer(\%insertion_data_answer,$self->db,$sql);
+     #$self->insertions('host_answer',\%insertion_data_answer,$self->db);
+    insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
     $self->stash(split_stdout =>[@prepared_data]);
 }
 =pod
@@ -346,7 +336,7 @@ sub create_graph {
  	my $sql=$self->sql;
     my $id_user=get_id_user($login_cookie,$self->db,$sql);
  	my %insertion_data_host=get_hash_host_data($id_user,$host,$login,$password,$port,$date,'ps -aux --sort=-%cpu | head -16');
-    create_host_query(\%insertion_data_host,$self->db,$sql);
+    insertions('host_data',\%insertion_data_host,$self->db,$sql);
     my @stdout=split /\n/, $stdout;
     delete $stdout[0];
     @stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
@@ -379,7 +369,7 @@ sub create_graph {
     my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
     $date=generate_date($date);
     my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
-    create_host_answer(\%insertion_data_answer,$self->db,$sql);
+    insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
 }
 =pod
 show_command
