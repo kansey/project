@@ -1,8 +1,0 @@
- % for my $line (@$split_stdout) {
-
-  % for my $el (@$line) {
-    <%= $el %> 
-%}
-
-<br>
-%}
