@@ -20,7 +20,7 @@ takes:Ref to a hash with the values for the selection conditions,helper db,helpe
 return:scalar variable with the value of the id  
 =cut
 sub user_exists {
-    my($data,$db,$sql)=@_;
+	my($data,$db,$sql)=@_;
     my $table='users';
     my($stmt,@bind)=$sql->select($table,[qw/id_user/],$data);
     my $sth =$db->prepare($stmt);
@@ -65,7 +65,7 @@ takes:scalar variable with a value of a login form,helper db,helper sql
 return:scalar variable with a string of sampling or error and undef 
 =cut
 sub get_id_user {
-    my($login,$db,$sql)=@_;
+	my($login,$db,$sql)=@_;
     my $table='users';
     my($stmt,@bind)=$sql->select($table,[qw/id_user/],[{login=>$login}]);
     my $sth =$db->prepare($stmt);
@@ -92,7 +92,7 @@ takes:scalar variable with a value of a email form,helper db,helper sql
 return:scalar variable with a string of sampling or error and undef 
 =cut
 sub get_id_by_mail {
-    my($email,$db,$sql)=@_;
+	my($email,$db,$sql)=@_;
     my $table='email';
     my($stmt,@bind)=$sql->select($table,[qw/id_user/],[{mail=>$email}]);
     my $sth =$db->prepare($stmt);
@@ -197,13 +197,13 @@ sub sendmail {
 		$self->render(text=>"Введен неккоректный email!",status=>403);
 	}
 	my $sql=$self->sql;
-        my $id_user=get_id_by_mail($mail,$self->db,$sql);
-        my $password=generate_pas();
-        update_pas($id_user,$password,$self->db,$sql);
-        $self->mail(
-        	to =>"$mail",
-                subject =>'Project SSH',
-                data =>"Ваш пароль был изменен на $password"
-        );
+    my $id_user=get_id_by_mail($mail,$self->db,$sql);
+    my $password=generate_pas();
+    update_pas($id_user,$password,$self->db,$sql);
+    $self->mail(
+		to =>"$mail",
+        subject =>'Project SSH',
+        data =>"Ваш пароль был изменен на $password"
+    );
 }
 1;

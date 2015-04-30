@@ -13,11 +13,13 @@ sub startup {
     #Plugin by sending mail message
     $self->plugin(mail =>{
     	from =>'project-ssh@mail.ru',
-    	type => 'text/html'});
+    	type => 'text/html'}
+    );
     # Router
     my $r = $self->routes;
     $r->get('/')->to('users#aut');
     $r->get('/show')->to('meny#show_command');
+    $r->get('/show_hosts')->to('meny#show_hosts');
     $r->post('/meny')->to('users#meny');
     $r->post('/reg')->to('users#registration');
     $r->post('/create_email')->to('users#create_email');
@@ -26,7 +28,7 @@ sub startup {
     $r->post('/vsz')->to('meny#handling_vsz');
     $r->post('/rss')->to('meny#handling_rss');
     $r->post('/graph')->to('meny#create_graph');
-    
+        
     my $dbh = DBI->connect('dbi:Pg:dbname=project', 'postgres', '123456',{
     	PrintError => 0,
         AutoCommit => 1,
