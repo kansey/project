@@ -23,7 +23,7 @@ return:object Class::Date containing the string with the date and time
 sub generate_date {
 	my $date=@_;
 	my $now = now;
-    return $date=$now->string ; 
+    	return $date=$now->string ; 
 }
 =pod
 check_port
@@ -42,7 +42,7 @@ takes:scalar variable with a value of a login form,helper db,helper sql
 return:scalar variable with a string of sampling or error and undef 
 =cut
 sub get_id_user {
-	my($login,$db,$sql)=@_;
+    my($login,$db,$sql)=@_;
     my $table='users';
     my($stmt,@bind)=$sql->select($table,[qw/id_user/],[{login=>$login}]);
     my $sth =$db->prepare($stmt);
@@ -57,7 +57,7 @@ sub get_hash_host_data {
 		'"user"' =>$_[2],
 		password =>$_[3],
 		port     =>$_[4],
-        time     =>$_[5],
+        	time     =>$_[5],
 		cmd      =>$_[6]
 	);
 }
@@ -85,9 +85,9 @@ return:array
  	my @gluing_data=@_;
  	for (my $i =0; $i<@gluing_data; $i++){
  		if ($i > 10){
- 			$gluing_data[10]=$gluing_data[10].$gluing_data[$i];
- 			delete $gluing_data[$i];
-        }
+ 		   $gluing_data[10]=$gluing_data[10].$gluing_data[$i];
+ 		   delete $gluing_data[$i];
+        	}
  	} 	
 	return @gluing_data;
 }
@@ -98,7 +98,7 @@ takes:scalar variable with a value of a id connect and datetime,helper db,helper
 return:scalar variable with a string of sampling or error and undef 
 =cut
 sub get_id_con{
-	my($id,$date,$db,$sql)=@_;
+    my($id,$date,$db,$sql)=@_;
     my $table='host_data';
     my($stmt,@bind)=$sql->select($table,[qw/id_conn/],[{id_user=>$id,time=>$date}]);
     my $sth =$db->prepare($stmt);
@@ -147,8 +147,8 @@ sub plotting {
 		line_width=>2,
 		dclrs=>['blue']
 	)or warn $mygraph->error;
-    my $myimage = $mygraph->plot(\@data) or die $mygraph->error;
-    return $myimage;
+    	my $myimage = $mygraph->plot(\@data) or die $mygraph->error;
+    	return $myimage;
 }
 =pod
 check_host 
@@ -172,11 +172,9 @@ return:graphic PNG file format saved on the server side
 sub create_graph_hosts {
 	my @list=@_;
 	my $g = GraphViz->new(bgcolor=>'red');
-	@list=map{
-		$g->add_node("$_");
-    }@list;
-    my $image=$g->as_png;
-    return $image;
+	@list=map{$g->add_node("$_");}@list;
+    	my $image=$g->as_png;
+    	return $image;
 }
 =pod
 save_the_file
@@ -187,8 +185,8 @@ return:graphic PNG file format saved on the server side
 sub save_the_file {
 	my $image=shift;
 	open(IMG, '>public/ico/graph.png') or die $!;
-    print IMG $image->png;
-    close IMG;
+    	print IMG $image->png;
+    	close IMG;
 }
 =pod
 save_the_file
@@ -199,8 +197,8 @@ return:graphic PNG file format saved on the server side
 sub save_the_graph {
 	my $image=shift;
 	open(IMG, '>public/ico/graph_of_hosts.png') or die $!;
-    print IMG $image;
-    close IMG;
+    	print IMG $image;
+    	close IMG;
 }
 =pod
 get_command
@@ -210,10 +208,10 @@ return:reference to an array containing a reference to an array for each row of 
 =cut
 sub get_command {
 	my($data,$db,$sql)=@_;
-    my $table='host_data';
-    my($stmt,@bind)=$sql->select($table,[qw/host port cmd time/],$data);
-    my $cmd=$db->selectall_arrayref($stmt,{slice=>{}},@bind);
-    return $cmd;
+    	my $table='host_data';
+    	my($stmt,@bind)=$sql->select($table,[qw/host port cmd time/],$data);
+    	my $cmd=$db->selectall_arrayref($stmt,{slice=>{}},@bind);
+    	return $cmd;
 }
 =pod
 get_hosts_list
@@ -249,8 +247,8 @@ sub handling_cpu {
 	utf8::encode($password);
 	utf8::encode($port);
 	my($stdout, $stderr, $exit);
-	   	if (!defined $get_check){
-   		$self->render(text=>"Не заполнены обязательные поля,вернитесь на прошлую страницу!",status=>403);
+	if (!defined $get_check){
+   	   $self->render(text=>"Не заполнены обязательные поля,вернитесь на прошлую страницу!",status=>403);
 	}
 	$date=generate_date($date);
 	$port=check_port($port);
@@ -258,19 +256,19 @@ sub handling_cpu {
 	$SSH->login($login,$password);
 	($stdout, $stderr, $exit) = $SSH->cmd('ps -aux --sort=-%cpu | head -16');
 	my $sql=$self->sql;
-    my $id_user=get_id_user($login_cookie,$self->db,$sql);
-    my %insertion_data_host=get_hash_host_data($id_user,$host,$login,$password,$port,$date,'ps -aux --sort=-%cpu | head -16');
-    insertions('host_data',\%insertion_data_host,$self->db,$sql);
-    my @stdout=split /\n/, $stdout;
-    delete $stdout[0];
-    @stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
-    @$_=gluing_elements(@$_)for @prepared_data;
-    map{map{utf8::decode($_);}@$_;}@prepared_data;
-    my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
-    $date=generate_date($date);
-    my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
-    insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
-    $self->stash(split_stdout =>[@prepared_data]);  
+    	my $id_user=get_id_user($login_cookie,$self->db,$sql);
+    	my %insertion_data_host=get_hash_host_data($id_user,$host,$login,$password,$port,$date,'ps -aux --sort=-%cpu | head -16');
+    	insertions('host_data',\%insertion_data_host,$self->db,$sql);
+    	my @stdout=split /\n/, $stdout;
+    	delete $stdout[0];
+    	@stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
+    	@$_=gluing_elements(@$_)for @prepared_data;
+    	map{map{utf8::decode($_);}@$_;}@prepared_data;
+    	my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
+    	$date=generate_date($date);
+    	my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
+    	insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
+    	$self->stash(split_stdout =>[@prepared_data]);  
 }
 =pod
 handling_vsz
@@ -297,23 +295,23 @@ sub handling_vsz {
 	}
 	$date=generate_date($date);
 	$port=check_port($port);
-    my $SSH=Net::SSH::Perl->new($host,debug=>1,protocol=>'1,2',port=>$port) || die $!;
+    	my $SSH=Net::SSH::Perl->new($host,debug=>1,protocol=>'1,2',port=>$port) || die $!;
 	$SSH->login($login,$password);
  	($stdout, $stderr, $exit) = $SSH->cmd('ps -aux --sort=-vsz | head -16');
  	my $sql=$self->sql;
-    my $id_user=get_id_user($login_cookie,$self->db,$sql);
+    	my $id_user=get_id_user($login_cookie,$self->db,$sql);
  	my %insertion_data_host=get_hash_host_data($id_user,$host,$login,$password,$port,$date,'ps -aux --sort=-vsz | head -16');
-    insertions('host_data',\%insertion_data_host,$self->db,$sql);
-    my @stdout=split /\n/, $stdout;
-    delete $stdout[0];
-    @stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
-    @$_=gluing_elements(@$_)for @prepared_data;
-    map{map{utf8::decode($_);}@$_;}@prepared_data;
-    my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
-    $date=generate_date($date);
-    my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
-    insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
-    $self->stash(split_stdout =>[@prepared_data]);
+    	insertions('host_data',\%insertion_data_host,$self->db,$sql);
+    	my @stdout=split /\n/, $stdout;
+    	delete $stdout[0];
+    	@stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
+    	@$_=gluing_elements(@$_)for @prepared_data;
+    	map{map{utf8::decode($_);}@$_;}@prepared_data;
+    	my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
+    	$date=generate_date($date);
+    	my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
+    	insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
+    	$self->stash(split_stdout =>[@prepared_data]);
 }
 =pod
 handling_rss
@@ -336,7 +334,7 @@ sub handling_rss {
 	utf8::encode($port);
 	my($stdout, $stderr, $exit);
    	if (!defined $get_check){
-   		$self->render(text=>"Не заполнены обязательные поля,вернитесь на прошлую страницу!",status=>403);
+   	    $self->render(text=>"Не заполнены обязательные поля,вернитесь на прошлую страницу!",status=>403);
 	}
 	$date=generate_date($date);
 	$port=check_port($port);
@@ -344,20 +342,20 @@ sub handling_rss {
 	$SSH->login($login,$password);
  	($stdout, $stderr, $exit) = $SSH->cmd('ps -aux --sort=-rss | head -16');
  	my $sql=$self->sql;
-    my $id_user=get_id_user($login_cookie,$self->db,$sql);
+    	my $id_user=get_id_user($login_cookie,$self->db,$sql);
  	my %insertion_data_host=get_hash_host_data($id_user,$host,$login,$password,$port,$date,'ps -aux --sort=-rss|head -16');
-    insertions('host_data',\%insertion_data_host,$self->db,$sql);
-    my @stdout=split /\n/, $stdout;
-    delete $stdout[0];
-    @stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
-    @$_=gluing_elements(@$_)for @prepared_data;
-    map{map{utf8::decode($_);}@$_;}@prepared_data;
-    my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
-    $date=generate_date($date);
-    my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
-     #$self->insertions('host_answer',\%insertion_data_answer,$self->db);
-    insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
-    $self->stash(split_stdout =>[@prepared_data]);
+    	insertions('host_data',\%insertion_data_host,$self->db,$sql);
+    	my @stdout=split /\n/, $stdout;
+    	delete $stdout[0];
+    	@stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
+    	@$_=gluing_elements(@$_)for @prepared_data;
+    	map{map{utf8::decode($_);}@$_;}@prepared_data;
+    	my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
+    	$date=generate_date($date);
+    	my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
+     	#$self->insertions('host_answer',\%insertion_data_answer,$self->db);
+    	insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
+    	$self->stash(split_stdout =>[@prepared_data]);
 }
 =pod
 create_graph
@@ -375,7 +373,7 @@ sub create_graph {
 	my $login_cookie=$self->every_signed_cookie('login')->[0];
 	my $date;
 	if (!defined $get_check){
-   		$self->render(text=>"Не заполнены обязательные поля,вернитесь на прошлую страницу!",status=>403);
+   	    $self->render(text=>"Не заполнены обязательные поля,вернитесь на прошлую страницу!",status=>403);
 	}
 	$date=generate_date($date);
 	my @prepared_data;
@@ -388,42 +386,42 @@ sub create_graph {
 	$SSH->login($login,$password);
  	($stdout, $stderr, $exit) = $SSH->cmd('ps -aux --sort=-%cpu|head -16');
  	my $sql=$self->sql;
-    my $id_user=get_id_user($login_cookie,$self->db,$sql);
+    	my $id_user=get_id_user($login_cookie,$self->db,$sql);
  	my %insertion_data_host=get_hash_host_data($id_user,$host,$login,$password,$port,$date,'ps -aux --sort=-%cpu | head -16');
-    insertions('host_data',\%insertion_data_host,$self->db,$sql);
-    my @stdout=split /\n/, $stdout;
-    delete $stdout[0];
-    @stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
-    @$_=gluing_elements(@$_)for @prepared_data;
-    map{map{utf8::decode($_);}@$_;}@prepared_data;
-    my @cpu;
-    map{
-    	my @ref=@$_;
+    	insertions('host_data',\%insertion_data_host,$self->db,$sql);
+    	my @stdout=split /\n/, $stdout;
+    	delete $stdout[0];
+    	@stdout=map{my @arr=splitting($_);push @prepared_data,@arr;}@stdout;
+    	@$_=gluing_elements(@$_)for @prepared_data;
+    	map{map{utf8::decode($_);}@$_;}@prepared_data;
+    	my @cpu;
     	map{
+    		my @ref=@$_;
+    		map{
     		my $i=$_;
     		if ($i==2){
-    			push @cpu, $ref[$i];
-		    }
-	    }0..@ref;
-    }@prepared_data;
-    my @vsz;
-    map{
-    	my @ref=@$_;
+    		    push @cpu, $ref[$i];
+		}
+	    	}0..@ref;
+    	}@prepared_data;
+    	my @vsz;
     	map{
-    		my $i=$_;
-    		if ($i==4){
-    			push @vsz, $ref[$i];
-		    }
-	    }0..@ref;
-    }@prepared_data;
-    @vsz=reverse @vsz;
-    @cpu=sort {$a<=>$b}@cpu;
-    my $graph=plotting(\@cpu,\@vsz);
-    save_the_file($graph);
-    my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
-    $date=generate_date($date);
-    my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
-    insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
+    		my @ref=@$_;
+    		map{
+    			my $i=$_;
+    			if ($i==4){
+    			    push @vsz, $ref[$i];
+		    	}
+	    	}0..@ref;
+    	}@prepared_data;
+    	@vsz=reverse @vsz;
+    	@cpu=sort {$a<=>$b}@cpu;
+    	my $graph=plotting(\@cpu,\@vsz);
+    	save_the_file($graph);
+    	my $id_conn=get_id_con($id_user,$date,$self->db,$sql);
+    	$date=generate_date($date);
+    	my %insertion_data_answer=get_hash_host_answer($stdout,$id_conn,$id_user,$date);
+    	insertions('host_answer',\%insertion_data_answer,$self->db,$sql);
 }
 =pod
 show_command
@@ -435,11 +433,11 @@ sub show_command {
 	my $self=shift;
 	my $login_cookie=$self->every_signed_cookie('login')->[0];
 	my $sql=$self->sql;
-    my $id_user=get_id_user($login_cookie,$self->db,$sql);
-    my %select_show_cmd=get_hash_id_user($id_user);
-    my $cmd=get_command(\%select_show_cmd,$self->db,$sql);
-    #$self->render(text => "@$cmd", status => 403);
-    $self->stash(cmd =>$cmd);
+    	my $id_user=get_id_user($login_cookie,$self->db,$sql);
+    	my %select_show_cmd=get_hash_id_user($id_user);
+    	my $cmd=get_command(\%select_show_cmd,$self->db,$sql);
+    	#$self->render(text => "@$cmd", status => 403);
+    	$self->stash(cmd =>$cmd);
 }
 =pod
 handling_rss
