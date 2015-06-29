@@ -39,7 +39,7 @@ sub check_password {
 	my $confirm=shift;
 	my $check=1;
 	if ($pas ne $confirm) {
-		$check=undef;
+	   $check=undef;
 	}
 	return $check;
 }
@@ -114,7 +114,7 @@ sub update_pas {
 	my %where=(id_user=>"$id_user");
 	my($stmt,@bind)=$sql->update($table,\%fieldvals,\%where);
 	my $sth =$db->prepare($stmt);
-    $sth->execute(@bind);
+        $sth->execute(@bind);
 }
 =pod
 aut
@@ -127,7 +127,7 @@ sub aut {
 	if (my $cookie=$self->every_signed_cookie('login')->[0]){
 	   $self->render(template => 'users/meny');
         }else{
-    	$self->render(template => 'users/aut');
+    	   $self->render(template => 'users/aut');
         }
 }
 =pod
@@ -194,16 +194,16 @@ sub sendmail {
 	my $mail=$self->param('mail');
 	my $check_email=check_email($mail);
 	if (!defined $check_email) {
-		$self->render(text=>"Введен неккоректный email!",status=>403);
+	    $self->render(text=>"Введен неккоректный email!",status=>403);
 	}
 	my $sql=$self->sql;
-    my $id_user=get_id_by_mail($mail,$self->db,$sql);
-    my $password=generate_pas();
-    update_pas($id_user,$password,$self->db,$sql);
-    $self->mail(
-	to =>"$mail",
-        subject =>'Project SSH',
-        data =>"Ваш пароль был изменен на $password"
-    );
+        my $id_user=get_id_by_mail($mail,$self->db,$sql);
+        my $password=generate_pas();
+        update_pas($id_user,$password,$self->db,$sql);
+        $self->mail(
+        	to =>"$mail",
+        	subject =>'Project SSH',
+        	data =>"Ваш пароль был изменен на $password"
+       );
 }
 1;
