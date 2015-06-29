@@ -143,14 +143,14 @@ sub meny {
 	my $get_check=$self->check_forms($login,$password);
 	if (!defined $get_check) {
 	   $self->render(text=>"Введены некорректные данные с формы,перейдите на страницу входа",status=>403);	
-    }
-    #my $cookie=$self->signed_cookie("$login");
-    my $sql=$self->sql;
-    my %insertion_data_user=get_hash_user($login,$password);
-    my $id_user=user_exists(\%insertion_data_user,$self->db,$sql);
-    if($id_user){
+    	}
+	#my $cookie=$self->signed_cookie("$login");
+    	my $sql=$self->sql;
+    	my %insertion_data_user=get_hash_user($login,$password);
+    	my $id_user=user_exists(\%insertion_data_user,$self->db,$sql);
+    	if($id_user){
     	$self->signed_cookie(login =>$login,{expires => time + 2000});
-    }else{
+    	}else{
     	$self->render(text =>'Неверное имя пользователя / пароль',status => 403);
     }
 }
