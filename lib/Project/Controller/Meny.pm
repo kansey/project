@@ -398,12 +398,12 @@ sub create_graph {
     	map{
     		my @ref=@$_;
     		map{
-    		my $i=$_;
-    		if ($i==2){
-    		    push @cpu, $ref[$i];
-		}
-	    	}0..@ref;
-    	}@prepared_data;
+    			my $i=$_;
+    			if ($i==2){
+    		    	    push @cpu, $ref[$i];
+			}
+	    		}0..@ref;
+    		}@prepared_data;
     	my @vsz;
     	map{
     		my @ref=@$_;
