@@ -49,7 +49,7 @@ return:scarlar var witn values undef or 1
     	#for check to not empty value
     	@data_form=map{
     		if ($_ eq ''){
-    			$check=undef; 
+    		$check=undef; 
 		}
 	    }@data_form;
 	    return $check;
